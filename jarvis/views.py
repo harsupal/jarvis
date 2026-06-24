@@ -9,7 +9,7 @@ import json, datetime, random, os
 
 # Load .env file
 
-load_dotenv(Path(__file__).resolve().parent.parent / '.env')
+#load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
