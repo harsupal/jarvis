@@ -51,11 +51,16 @@ def ask_jarvis(request):
                 )
                 response = res.choices[0].message.content
 
-            ChatHistory.objects.create(user_message=command, jarvis_response=response)
+            # DB save — error aaye toh skip karo
+            try:
+                ChatHistory.objects.create(user_message=command, jarvis_response=response)
+            except Exception:
+                pass
+
             return JsonResponse({"response": response})
 
         except Exception as e:
-            traceback.print_exc()  # Render logs mein dikhega
+            traceback.print_exc()
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "POST request required"}, status=405)
