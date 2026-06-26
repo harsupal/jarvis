@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-(*m15zrlt&8vwr_*y1p!+bx1jtxr%-w&yym9z^ppcotgr%-os-
 DEBUG = True
 
 # settings.py
-ALLOWED_HOSTS =["*"]
+ALLOWED_HOSTS = ['jarvis-t2qp.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition

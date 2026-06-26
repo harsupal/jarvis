@@ -5,39 +5,33 @@ from .models import ChatHistory
 from groq import Groq
 from dotenv import load_dotenv
 from pathlib import Path
-import json, datetime, random, os
+import json, os, traceback
 
-# Load .env file
-
+# Load .env
 load_dotenv(Path(__file__).resolve().parent.parent / '.env')
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 # Main page
-
 def index(request):
     return render(request, 'index.html')
 
 
- #Jarvis logic
-
+# Jarvis logic
 @csrf_exempt
 def ask_jarvis(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        command = data.get("command", "").strip()
-        cmd = command.lower()
+        try:
+            data = json.loads(request.body)
+            command = data.get("command", "").strip()
+            cmd = command.lower()
 
-  
-        # Hello
-        if any(w in cmd for w in ["hello", "hi", "namaste", "hey"]):
-            response = "Hello Sir! How can I help you?" if any(w in cmd for w in ["hello", "hi", "hey"]) else "Namaste Sir! Kaise madad kar sakta hoon?"
+            # Hello
+            if any(w in cmd for w in ["hello", "hi", "namaste", "hey"]):
+                response = "Hello Sir! How can I help you?" if any(w in cmd for w in ["hello", "hi", "hey"]) else "Namaste Sir! Kaise madad kar sakta hoon?"
 
-        
-
-# Groq AI — everything else
-        else:
-            try:
+            # Groq AI — everything else
+            else:
                 res = client.chat.completions.create(
                     model="llama-3.1-8b-instant",
                     messages=[
@@ -56,10 +50,12 @@ def ask_jarvis(request):
                     max_tokens=300,
                 )
                 response = res.choices[0].message.content
-            except Exception as e:
-                response = f"Sir, something went wrong: {str(e)}"
 
-        ChatHistory.objects.create(user_message=command, jarvis_response=response)
-        return JsonResponse({"response": response})
+            ChatHistory.objects.create(user_message=command, jarvis_response=response)
+            return JsonResponse({"response": response})
 
-    return JsonResponse({"error": "POST request required"})
+        except Exception as e:
+            traceback.print_exc()  # Render logs mein dikhega
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "POST request required"}, status=405)
